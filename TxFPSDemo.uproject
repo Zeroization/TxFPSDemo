@@ -1,13 +1,16 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{0BD2BCBC-47EE-3754-09DE-739A190F61EE}",
+	"EngineAssociation": "{E91A470E-499D-140C-623C-AE8CEA46E26E}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
 		{
 			"Name": "TxFPSDemo",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
 		}
 	],
 	"Plugins": [
