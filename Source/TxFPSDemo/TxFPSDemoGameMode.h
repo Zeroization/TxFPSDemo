@@ -41,6 +41,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	// GameOver计时器回调
+	void OnCountDown();
 	void OnGameOver();
 };

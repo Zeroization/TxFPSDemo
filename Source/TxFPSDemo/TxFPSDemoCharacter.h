@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayInterface.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "TxFPSDemoCharacter.generated.h"
@@ -17,7 +18,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class ATxFPSDemoCharacter : public ACharacter
+class ATxFPSDemoCharacter : public ACharacter, public IGameplayInterface
 {
 	GENERATED_BODY()
 
@@ -63,6 +64,10 @@ protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface
+
+	// Gameplay 接口 - 开始
+	virtual void OnGetScore_Implementation() override;
+	// Gameplay 接口 - 结束
 
 public:
 	/** Returns Mesh1P subobject **/

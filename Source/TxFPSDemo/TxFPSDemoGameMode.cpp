@@ -6,6 +6,7 @@
 #include "TargetBlock.h"
 #include "TxFPSDemoCharacter.h"
 #include "TimerManager.h"
+#include "TxFPSDemoPlayerController.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
 
@@ -48,31 +49,57 @@ void ATxFPSDemoGameMode::BeginPlay()
 	}
 
 	// 初始化游戏结算计时器
-	GetWorldTimerManager().SetTimer(GameOverTimerHandle, this, &ATxFPSDemoGameMode::OnGameOver,
-	                                GameOverInterval);
+	GetWorldTimerManager().SetTimer(GameOverTimerHandle, this, &ATxFPSDemoGameMode::OnCountDown,
+	                                1.0f, true);
+}
+
+void ATxFPSDemoGameMode::OnCountDown()
+{
+	--GameOverInterval;
+
+	// 更新所有玩家的HUD
+	for (APlayerState* PlayerState : GetGameState<AGameStateBase>()->PlayerArray)
+	{
+		ATxFPSDemoPlayerController* PlayerController = Cast<ATxFPSDemoPlayerController>(
+			PlayerState->GetPlayerController());
+		if (PlayerController != nullptr)
+		{
+			PlayerController->UpdateCountdown(GameOverInterval);
+		}
+	}
+
+	if (GameOverInterval <= 0)
+	{
+		GetWorldTimerManager().ClearTimer(GameOverTimerHandle);
+		OnGameOver();
+	}
 }
 
 void ATxFPSDemoGameMode::OnGameOver()
 {
-	if (GEngine)
+	TArray<TPair<FString, float>> PlayerScoreList;
+	for (APlayerState* PlayerState : GetGameState<AGameStateBase>()->PlayerArray)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "====GAME OVER====");
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "  NAME     SCORE ");
-
-		// 统计每个玩家的分数和总分数
-		float TotalScore = 0.f;
-		for (APlayerState* PlayerState : GetGameState<AGameStateBase>()->PlayerArray)
+		ATxFPSDemoCharacter* Player = Cast<ATxFPSDemoCharacter>(PlayerState->GetPlayerController()->GetCharacter());
+		if (Player != nullptr)
 		{
-			ATxFPSDemoCharacter* Player = Cast<ATxFPSDemoCharacter>(PlayerState->GetPlayerController()->GetCharacter());
-			if (Player != nullptr)
-			{
-				float Score = Player->GetScoreComponent()->GetScore();
-				FString TmpMsg = PlayerState->GetName() + FString::Printf(TEXT("    %f"), Score);
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TmpMsg);
-				TotalScore += Score;
-			}
+			FString Name = PlayerState->GetName();
+			float Score = Player->GetScoreComponent()->GetScore();
+			PlayerScoreList.Add({Name, Score});
 		}
-		FString TmpMsg = FString::Printf(TEXT("Total Score: %f"), TotalScore);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TmpMsg);
+	}
+	PlayerScoreList.Sort([](const TPair<FString, float>& A, const TPair<FString, float>& B)
+	{
+		return A.Value > B.Value;
+	});
+
+	for (APlayerState* PlayerState : GetGameState<AGameStateBase>()->PlayerArray)
+	{
+		ATxFPSDemoPlayerController* PlayerController = Cast<ATxFPSDemoPlayerController>(
+			PlayerState->GetPlayerController());
+		if (PlayerController != nullptr)
+		{
+			PlayerController->ShowGameOverWidget(PlayerScoreList);
+		}
 	}
 }

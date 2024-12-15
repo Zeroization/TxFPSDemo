@@ -53,12 +53,6 @@ void ATxFPSDemoProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			// 给Player加分
 			float Score = TargetBlock->GetScore();
 			Player->GetScoreComponent()->AddScore(Score);
-			if (GEngine)
-			{
-				FString DebugMsg = FString::Printf(
-					TEXT("Current player's score: %f"), Player->GetScoreComponent()->GetScore());
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, DebugMsg);
-			}
 		}
 
 		Destroy();

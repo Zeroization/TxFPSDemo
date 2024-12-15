@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "ScoreComponent.h"
+#include "TxFPSDemoPlayerController.h"
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -70,6 +71,16 @@ void ATxFPSDemoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		       TEXT(
 			       "'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
 		       ), *GetNameSafe(this));
+	}
+}
+
+void ATxFPSDemoCharacter::OnGetScore_Implementation()
+{
+	// 更新HUD
+	ATxFPSDemoPlayerController* PlayerController = Cast<ATxFPSDemoPlayerController>(GetController());
+	if (PlayerController != nullptr)
+	{
+		PlayerController->UpdateCurrentScore(ScoreComponent->GetScore());
 	}
 }
 
